@@ -1,0 +1,17 @@
+{
+  "name": "auto-link",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Auto Link: car wash, tow truck and car parts app",
+  "scripts": {
+    "www": "node scripts/prepare-www.js",
+    "android:add": "npm run www && npx cap add android",
+    "android:sync": "npm run www && npx cap sync android",
+    "android:open": "npx cap open android"
+  },
+  "dependencies": {
+    "@capacitor/android": "latest",
+    "@capacitor/cli": "latest",
+    "@capacitor/core": "latest"
+  }
+}

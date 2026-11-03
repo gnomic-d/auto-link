@@ -1,0 +1,6 @@
+{
+  "appId": "com.autolink.app",
+  "appName": "Auto Link",
+  "webDir": "www",
+  "server": { "androidScheme": "https" }
+}
