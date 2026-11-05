@@ -1,6 +1,6 @@
 /* Auto Link service worker: network first, falls back to the cache when offline. */
-const CACHE = 'auto-link-v1';
-const CORE = ['./', 'index.html', 'css/style.css', 'js/config.js', 'js/maps.js', 'js/app.js', 'manifest.webmanifest', 'images/logo.png'];
+const CACHE = 'auto-link-v2';
+const CORE = ['./', 'index.html', 'css/style.css', 'js/config.js', 'js/maps.js', 'js/auth.js', 'js/app.js', 'manifest.webmanifest', 'images/logo.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));

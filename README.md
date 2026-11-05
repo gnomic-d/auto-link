@@ -5,17 +5,13 @@ Car wash booking (at our bay or at your location), tow truck requests, a car par
 ## 1. Run it in VS Code
 Open this folder in VS Code, install the **Live Server** extension, right-click `index.html` and choose "Open with Live Server".
 
-## 2. Turn on Google Maps
-1. Go to https://console.cloud.google.com and create a project.
-2. Set up billing for the project (Google requires it for Maps, and gives a monthly free usage credit; check current pricing).
-3. Enable these APIs: **Maps JavaScript API** and **Geocoding API**.
-4. Create an API key (APIs and Services > Credentials).
-5. Restrict the key: under "Application restrictions" choose HTTP referrers and add `http://localhost:*` and your website address (for example `https://your-site.netlify.app/*`). Under "API restrictions" allow only the two APIs above.
-6. Open `js/config.js`, paste the key into `GOOGLE_MAPS_API_KEY`, and set your wash bay name, address and coordinates in `WASH_BAY`.
+## 2. Maps (free, no key)
+Maps use OpenStreetMap through Leaflet, so there is nothing to sign up for. Open `js/config.js` and set your wash bay name, address and coordinates (right-click your wash bay on Google Maps and copy the two numbers), and the 2-letter `COUNTRY` code for address search.
 
-Without a key everything still works. Maps show a notice and "Get directions" / "Open in Google Maps" links still open Google Maps.
+How maps are used: tap the map to place pickup (A) and drop-off (B) for a tow, or "Use my location". Distance is the straight-line distance between the pins x 1.3, a rough road estimate that can be edited. For mobile car washes, drop a pin where the team should come. Address search uses OpenStreetMap's free Nominatim service, which is meant for light use. If the app grows to many users, switch to a paid or self-hosted provider.
 
-How maps are used: tap the map to place pickup (A) and drop-off (B) for a tow, or "Use my location". Distance is the straight-line distance between the pins x 1.3, as a rough road estimate, and can be edited. For mobile car washes, drop a pin where the team should come.
+## Accounts and plans
+Sign in, register and the Silver, Gold and Platinum plans work with no setup. Accounts live in the phone's own storage, so they are not shared between devices, and passwords cannot be recovered. Plan payments use the same simulated card form and are not charged. For real accounts and real billing you need a backend, for example Firebase or Supabase for sign-in plus a payment provider.
 
 ## 3. Install it on a phone
 Phones only install web apps from **https** addresses (localhost works on your computer only).

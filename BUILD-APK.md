@@ -33,8 +33,5 @@ After any change to the web files run `npm run android:sync` and build again.
 2. Tap the file. When Android asks, allow **Install unknown apps** for the app you opened it from (for example Chrome, Files or WhatsApp).
 3. Tap Install. If Play Protect warns about an unrecognised app, choose "Install anyway". This appears because the app is not from the Play Store.
 
-## Google Maps key
-Put your key in `js/config.js` before building. In the Google Cloud key restrictions add `https://localhost/*` as an allowed website, because that is the address the app runs under inside the phone.
-
 ## Later: Google Play Store
 The debug APK is fine for your own phones and testers. Publishing on Play needs a signed release bundle (AAB) and a Play Console account (one-time fee).
