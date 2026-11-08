@@ -1,5 +1,5 @@
 /* Auto Link service worker: network first, falls back to the cache when offline. */
-const CACHE = 'auto-link-v2';
+const CACHE = 'auto-link-v3';
 const CORE = ['./', 'index.html', 'css/style.css', 'js/config.js', 'js/maps.js', 'js/auth.js', 'js/app.js', 'manifest.webmanifest', 'images/logo.png'];
 
 self.addEventListener('install', e => {

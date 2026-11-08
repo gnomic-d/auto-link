@@ -10,6 +10,11 @@ Maps use OpenStreetMap through Leaflet, so there is nothing to sign up for. Open
 
 How maps are used: tap the map to place pickup (A) and drop-off (B) for a tow, or "Use my location". Distance is the straight-line distance between the pins x 1.3, a rough road estimate that can be edited. For mobile car washes, drop a pin where the team should come. Address search uses OpenStreetMap's free Nominatim service, which is meant for light use. If the app grows to many users, switch to a paid or self-hosted provider.
 
+## Admin and customer
+Two roles: **customer** (anyone who registers) and **admin**. The admin account is created automatically the first time the app opens, using `CONFIG.ADMIN` in `js/config.js` (default email `admin@autolink.com`, password `Admin@12345`). Change the password there before sharing the app. The admin sees a dashboard with orders (change each order's status), customers and plans, and products (edit prices, hide or show). Customers see their own orders and the new status. Only signed-in customers see the subscription plans.
+
+Everything is saved on the phone it was created on, so the admin only sees orders made on that same phone. To have one admin see every customer's orders from different phones you need a backend (for example Firebase or Supabase).
+
 ## Accounts and plans
 Sign in, register and the Silver, Gold and Platinum plans work with no setup. Accounts live in the phone's own storage, so they are not shared between devices, and passwords cannot be recovered. Plan payments use the same simulated card form and are not charged. For real accounts and real billing you need a backend, for example Firebase or Supabase for sign-in plus a payment provider.
 
