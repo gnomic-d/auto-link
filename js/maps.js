@@ -1,51 +1,42 @@
-/* Google Maps helpers. Without a valid key the app still works; maps show a notice. */
+/* Free maps: Leaflet + OpenStreetMap tiles, Nominatim for address search. No API key needed. */
 const MapsKit = (() => {
-  const hasKey = () => /^AIza/.test(CONFIG.GOOGLE_MAPS_API_KEY || '');
-  let loader, geocoder;
-
-  const ready = () => {
-    if (!hasKey()) return Promise.reject(new Error('no-key'));
-    loader ??= new Promise((resolve, reject) => {
-      window.gm_authFailure = () => reject(new Error('auth'));
-      window.__mapsReady = async () => {
-        try {
-          await Promise.all(['maps', 'marker', 'geocoding'].map(l => google.maps.importLibrary(l)));
-          resolve();
-        } catch (e) { reject(e); }
-      };
-      const s = document.createElement('script');
-      s.src = 'https://maps.googleapis.com/maps/api/js?key=' + encodeURIComponent(CONFIG.GOOGLE_MAPS_API_KEY) + '&callback=__mapsReady&loading=async&v=weekly';
-      s.async = true;
-      s.onerror = () => reject(new Error('load'));
-      document.head.appendChild(s);
-    });
-    return loader;
-  };
+  const ready = () => window.L ? Promise.resolve() : Promise.reject(new Error('load'));
 
   const create = (el, center, zoom) => {
+    el._map?.remove();
     el.innerHTML = '';
-    return new google.maps.Map(el, { center, zoom, mapId: 'DEMO_MAP_ID', streetViewControl: false, mapTypeControl: false });
+    const map = L.map(el).setView([center.lat, center.lng], zoom);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    el._map = map;
+    setTimeout(() => map.invalidateSize(), 250);
+    return map;
   };
 
-  const marker = (map, position, glyph) => {
-    const pin = new google.maps.marker.PinElement({ glyphText: glyph, background: '#FFC21A', borderColor: '#0E2A2F', glyphColor: '#0E2A2F' });
-    return new google.maps.marker.AdvancedMarkerElement({ map, position, content: pin.element });
-  };
+  const marker = (map, p, glyph) => L.marker([p.lat, p.lng], {
+    icon: L.divIcon({ className: 'pin', html: '<span>' + glyph + '</span>', iconSize: [30, 30], iconAnchor: [15, 15] })
+  }).addTo(map);
 
   const line = (map, pts) => {
-    const bounds = new google.maps.LatLngBounds();
-    pts.forEach(p => bounds.extend(p));
-    map.fitBounds(bounds, 48);
-    return new google.maps.Polyline({ map, path: pts, strokeColor: '#0E2A2F', strokeWeight: 4 });
+    const ll = pts.map(p => [p.lat, p.lng]);
+    map.fitBounds(ll, { padding: [40, 40] });
+    return L.polyline(ll, { color: '#0E2A2F', weight: 4 }).addTo(map);
   };
 
+  // Address search and reverse lookup (OpenStreetMap Nominatim). Light use only: one request per tap.
   const geocode = async req => {
-    await ready();
-    geocoder ??= new google.maps.Geocoder();
-    const { results } = await geocoder.geocode({ ...req, region: CONFIG.REGION });
-    const r = results[0];
-    if (!r) throw new Error('none');
-    return { lat: r.geometry.location.lat(), lng: r.geometry.location.lng(), address: r.formatted_address };
+    const base = 'https://nominatim.openstreetmap.org';
+    const url = req.address
+      ? base + '/search?format=jsonv2&limit=1&accept-language=en&countrycodes=' + CONFIG.COUNTRY + '&q=' + encodeURIComponent(req.address)
+      : base + '/reverse?format=jsonv2&accept-language=en&lat=' + req.location.lat + '&lon=' + req.location.lng;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('geocode');
+    const d = await res.json();
+    const r = Array.isArray(d) ? d[0] : d;
+    if (!r || r.error) throw new Error('none');
+    return { lat: +r.lat, lng: +r.lon, address: r.display_name };
   };
 
   const locate = () => new Promise((res, rej) => {
@@ -61,9 +52,10 @@ const MapsKit = (() => {
     return 2 * R * Math.asin(Math.sqrt(d)) * 1.3;
   };
 
+  // Links that open the phone's maps app (free)
   const f = p => typeof p === 'string' ? p : p.lat + ',' + p.lng;
   const dirUrl = (a, b) => 'https://www.google.com/maps/dir/?api=1' + (a ? '&origin=' + encodeURIComponent(f(a)) : '') + '&destination=' + encodeURIComponent(f(b));
   const pinUrl = p => 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(f(p));
 
-  return { hasKey, ready, create, marker, line, geocode, locate, km, dirUrl, pinUrl };
+  return { ready, create, marker, line, geocode, locate, km, dirUrl, pinUrl };
 })();
